@@ -4,15 +4,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copy csproj and restore dependencies
-COPY *.csproj ./
-RUN dotnet restore
+# Copy only the project file first (so restore is cached)
+COPY ./TasksApi.csproj ./
+RUN dotnet restore TasksApi.csproj
 
-# Copy the rest of the backend source code
+# Copy the rest of the source code
 COPY . ./
 
-# Build the project (Release mode)
-RUN dotnet publish -c Release -o out
+# Build and publish the app
+RUN dotnet publish TasksApi.csproj -c Release -o out
 
 # ==============================
 # 2️⃣ Runtime Stage
@@ -20,14 +20,9 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
-# Copy compiled output from build stage
 COPY --from=build /app/out ./
-
-# Expose the default port for the API
 EXPOSE 5000
 
-# Set environment variable for ASP.NET Core
 ENV ASPNETCORE_URLS=http://+:5000
 
-# Start the app
 ENTRYPOINT ["dotnet", "TasksApi.dll"]
