@@ -2,7 +2,7 @@ import axios from 'axios';
 import { TaskItem } from './types';
 
 const api = axios.create({
-  baseURL: 'http://new-folder-jm8m.onrender.com/',
+  baseURL: 'https://new-folder-jm8m.onrender.com',
   headers: { 'Content-Type': 'application/json' }
 });
 
